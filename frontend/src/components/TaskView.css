@@ -1,0 +1,145 @@
+.task-form, .tasks-view {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.task-input, .personnel-select, .hours-input {
+    margin-right: 10px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+
+.assignment-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.button-group {
+    display: flex;
+    gap: 5px;
+}
+
+.edit-button, .delete-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 0 5px;
+}
+
+.edit-button:hover, .delete-button:hover {
+    opacity: 0.7;
+}
+
+.add-button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-bottom: 10px;
+    align-self: flex-start;
+}
+
+.add-button:hover {
+    background-color: #45a049;
+}
+
+.task-section {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 15px;
+    margin-bottom: 15px;
+    background-color: #f9f9f9;
+}
+
+.assignments {
+    margin-bottom: 10px;
+}
+
+.task-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.task-name {
+    font-weight: bold;
+    font-size: 18px;
+    flex-grow: 1;
+}
+
+.error-message {
+    color: red;
+    margin-top: 10px;
+}
+
+.edit-task-container {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Adjust spacing as needed */
+}
+
+.task-dropdown, .hours-input {
+    margin-right: 0; /* Remove margin to keep them close */
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    width: 100px; /* Adjust width as needed */
+}
+
+.dependencies {
+    margin-top: 15px;
+    border-top: 1px solid #ccc;
+    padding-top: 15px;
+    display: flex;
+    flex-direction: column; /* Stack items vertically */
+    text-align: left; /* Ensure text is aligned to the left */
+}
+
+.dependency-item {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.dependency-item span {
+    margin-right: 10px;
+}
+
+.add-dependency-container {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.add-dependency-container select {
+    flex-grow: 1;
+    margin-right: 10px;
+}
+
+.cancel-button {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.cancel-button:hover {
+    background-color: #d32f2f;
+}
+
+.button-container {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 10px;
+}
