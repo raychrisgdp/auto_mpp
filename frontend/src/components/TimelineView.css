@@ -18,7 +18,7 @@ body {
 }
 
 .timeline-table th, .timeline-table td {
-    border: 1px solid #ddd;
+    border: 1px solid #ddd; /* General border for all cells */
     padding: 8px;
     text-align: left;
 }
@@ -32,8 +32,8 @@ body {
     position: relative;
     height: 30px;
     padding: 0 !important;
-    border-left: none;
-    border-right: none;
+    border-left: none; /* Keep this to remove left border */
+    border-right: none; /* Keep this to remove right border */
     vertical-align: middle;
 }
 
@@ -43,6 +43,19 @@ body {
     left: 0;
     height: 100%;
     opacity: 0.8;
+    cursor: pointer; /* Add this to indicate it's interactive */
+    z-index: 10; /* Ensure Gantt bars are on top */
+}
+
+.custom-tooltip {
+    position: fixed;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    z-index: 1000;
+    pointer-events: none;
 }
 
 .timeline-summary {
@@ -66,8 +79,8 @@ body {
 }
 
 .personnel-hours li {
-    display: inline-block;
-    margin-right: 20px;
+    display: flex;
+    align-items: center;
     margin-bottom: 5px;
 }
 
@@ -76,19 +89,15 @@ body {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    text-align: left; /* Align text to the left */
 }
 
-.personnel-hours li, .task-durations li {
-    display: flex;
-    align-items: center;
-}
-
-.color-legend {
-    display: inline-block;
+.color-box {
     width: 20px;
     height: 20px;
     margin-right: 10px;
-    vertical-align: middle;
+    border: 1px solid #000;
+    flex-shrink: 0;
 }
 
 .timeline-table td:first-child, .timeline-table td:nth-child(2) {

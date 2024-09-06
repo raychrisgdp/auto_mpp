@@ -60,3 +60,11 @@
     color: red;
     margin-top: 10px;
 }
+
+.personnel-edit-input {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 5px;
+    width: auto; /* Adjust width as needed */
+    font-size: inherit; /* Ensure it inherits the font size from the parent */
+}

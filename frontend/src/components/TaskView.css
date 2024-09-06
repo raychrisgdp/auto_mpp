@@ -53,10 +53,13 @@
 
 .task-section {
     border: 1px solid #ccc;
-    border-radius: 5px;
+    border-radius: 10px; /* Make the corners rounded */
     padding: 15px;
     margin-bottom: 15px;
     background-color: #f9f9f9;
+    width: 48%; /* Set width to half of the container */
+    display: inline-block; /* Allow sections to sit next to each other */
+    vertical-align: top; /* Align sections to the top */
 }
 
 .assignments {
@@ -142,4 +145,15 @@
     display: flex;
     justify-content: flex-start;
     margin-bottom: 10px;
+}
+
+.task-form {
+    display: flex; /* Use flexbox to align items */
+    align-items: center; /* Align items vertically centered */
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    width: 100%; /* Ensure it takes full width */
+    max-width: none; /* Remove max-width to allow full width */
 }

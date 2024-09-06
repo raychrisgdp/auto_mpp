@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { NavLink, Route, BrowserRouter as Router, Switch } from 'react-router-dom';
 import './App.css';
 import PersonnelView from './components/PersonnelView';
@@ -6,6 +6,20 @@ import TasksView from './components/TasksView';
 import TimelineView from './components/TimelineView';
 
 function App() {
+  useEffect(() => {
+    function handleVisibilityChange() {
+      if (!document.hidden) {
+        // Force a re-render when the page becomes visible
+      }
+    }
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, []);
+
   return (
     <Router>
       <div className="App">

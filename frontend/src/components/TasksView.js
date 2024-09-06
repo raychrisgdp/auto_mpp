@@ -1,6 +1,6 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
-import { FaCheck, FaPlus } from 'react-icons/fa';
+import React, { useEffect, useRef, useState } from 'react';
+import { FaPlus } from 'react-icons/fa';
 import API_BASE_URL from '../config';
 import TaskForm from './TaskForm';
 import './TaskView.css';
@@ -10,12 +10,11 @@ function TasksView() {
     const [error, setError] = useState('');
     const [personnel, setPersonnel] = useState([]);
     const [editingTaskId, setEditingTaskId] = useState(null);
-    const [taskName, setTaskName] = useState('');
-    const [allTasks, setAllTasks] = useState([]);
     const [addingDependencyForTask, setAddingDependencyForTask] = useState(null);
     const [addingAssignmentForTask, setAddingAssignmentForTask] = useState(null);
     const [selectedPersonnel, setSelectedPersonnel] = useState('');
     const [newAssignmentHours, setNewAssignmentHours] = useState('');
+    const editableRef = useRef(null);
 
     useEffect(() => {
         fetchTasks();
@@ -26,7 +25,6 @@ function TasksView() {
         try {
             const response = await axios.get(`${API_BASE_URL}/tasks`);
             setTasks(response.data);
-            setAllTasks(response.data);
         } catch (err) {
             setError('Failed to fetch tasks');
         }
@@ -51,14 +49,12 @@ function TasksView() {
     };
 
     const handleEditTask = (taskId) => {
-        const task = tasks.find(t => t.id === taskId);
         setEditingTaskId(taskId);
-        setTaskName(task.name);
     };
 
-    const handleUpdateTask = async (taskId) => {
+    const handleUpdateTask = async (taskId, newName) => {
         try {
-            await axios.put(`${API_BASE_URL}/tasks/${taskId}`, { name: taskName });
+            await axios.put(`${API_BASE_URL}/tasks/${taskId}`, { name: newName });
             setEditingTaskId(null);
             fetchTasks();
         } catch (err) {
@@ -74,12 +70,6 @@ function TasksView() {
         const updatedTask = tasks.find(t => t.id === taskId);
         updatedTask.assignments[index].isEditing = true;
         updatedTask.assignments[index].originalHours = updatedTask.assignments[index].hours;
-        setTasks([...tasks]);
-    };
-
-    const handleUpdateAssignment = (taskId, index, field, value) => {
-        const updatedTask = tasks.find(t => t.id === taskId);
-        updatedTask.assignments[index][field] = value;
         setTasks([...tasks]);
     };
 
@@ -124,10 +114,6 @@ function TasksView() {
         }
     };
 
-    const handleEditDependency = async (taskId, dependencyId) => {
-        // This function is not needed as we're not editing dependencies, only adding or removing
-    };
-
     const handleRemoveDependency = async (taskId, dependencyId) => {
         try {
             const task = tasks.find(t => t.id === taskId);
@@ -142,6 +128,36 @@ function TasksView() {
         }
     };
 
+    const handleSubmitAssignmentEdit = async (taskId, assignmentId, hours, personnelId) => {
+        try {
+            await axios.put(`${API_BASE_URL}/tasks/${taskId}/assignments/${assignmentId}`, {
+                hours: hours,
+                personnel_id: personnelId
+            });
+            fetchTasks();
+        } catch (err) {
+            setError('Failed to update assignment');
+        }
+    };
+
+    const handleUpdateAssignment = async (taskId, assignment) => {
+        await handleSubmitAssignmentEdit(taskId, assignment.id, assignment.hours, assignment.personnel_id);
+        assignment.isEditing = false;
+        setTasks([...tasks]);
+    };
+
+    useEffect(() => {
+        if (editingTaskId !== null && editableRef.current) {
+            editableRef.current.focus();
+            const range = document.createRange();
+            const selection = window.getSelection();
+            range.selectNodeContents(editableRef.current);
+            range.collapse(false);
+            selection.removeAllRanges();
+            selection.addRange(range);
+        }
+    }, [editingTaskId]);
+
     return (
         <div className="tasks-view">
             <h2>Task Management</h2>
@@ -151,22 +167,24 @@ function TasksView() {
                 <div key={task.id} className="task-section">
                     <div className="task-header">
                         {editingTaskId === task.id ? (
-                            <div className="edit-task-container">
-                                <input
-                                    type="text"
-                                    value={taskName}
-                                    onChange={(e) => setTaskName(e.target.value)}
-                                    onKeyPress={(e) => {
-                                        if (e.key === 'Enter') {
-                                            handleUpdateTask(task.id);
-                                        }
-                                    }}
-                                    className="task-input"
-                                />
-                                <button onClick={() => handleUpdateTask(task.id)} className="submit-button">
-                                    <FaCheck />
-                                </button>
-                            </div>
+                            <span
+                                ref={editableRef}
+                                contentEditable
+                                suppressContentEditableWarning
+                                onBlur={(e) => {
+                                    handleUpdateTask(task.id, e.target.innerText);
+                                }}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                        e.preventDefault();
+                                        handleUpdateTask(task.id, e.target.innerText);
+                                        setEditingTaskId(null);
+                                    }
+                                }}
+                                className="task-name editable"
+                            >
+                                {task.name}
+                            </span>
                         ) : (
                             <>
                                 <span className="task-name">{task.name}</span>
@@ -184,10 +202,31 @@ function TasksView() {
                     <hr className="soft-line" />
                     <div className="assignments">
                         {task.assignments.map((assignment, index) => (
-                            <div key={index} className="assignment-row">
-                                <span className="assignment-content">
-                                    {personnel.find(p => p.id === assignment.personnel_id)?.name}: {assignment.hours} hours
-                                </span>
+                            <div key={assignment.id} className="assignment-row">
+                                {assignment.isEditing ? (
+                                    <div>
+                                        <span>
+                                            {personnel.find(p => p.id === assignment.personnel_id)?.name}: 
+                                        </span>
+                                        <input 
+                                            type="number" 
+                                            value={assignment.hours} 
+                                            onChange={(e) => {
+                                                assignment.hours = e.target.value;
+                                                setTasks([...tasks]);
+                                            }} 
+                                        />
+                                        <button onClick={() => handleUpdateAssignment(task.id, assignment, assignment.hours)}>Save</button>
+                                        <button onClick={() => {
+                                            assignment.isEditing = false;
+                                            setTasks([...tasks]);
+                                        }}>Cancel</button>
+                                    </div>
+                                ) : (
+                                    <span className="assignment-content">
+                                        {personnel.find(p => p.id === assignment.personnel_id)?.name}: {assignment.hours} hours
+                                    </span>
+                                )}
                                 <div className="button-group">
                                     <button onClick={() => handleEditAssignment(task.id, index)} className="edit-button">
                                         ✏️
@@ -237,7 +276,7 @@ function TasksView() {
                     <div className="dependencies">
                         <h4 style={{ textAlign: 'left' }}>Dependencies</h4>
                         {task.dependencies && task.dependencies.map(depId => {
-                            const depTask = allTasks.find(t => t.id === depId);
+                            const depTask = tasks.find(t => t.id === depId);
                             return (
                                 <div key={depId} className="dependency-item">
                                     <span>{depTask ? depTask.name : `Task ${depId}`}</span>
@@ -252,7 +291,7 @@ function TasksView() {
                                 <div className="add-dependency-form">
                                     <select onChange={(e) => handleSubmitDependency(task.id, parseInt(e.target.value))}>
                                         <option value="">Select Dependency</option>
-                                        {allTasks
+                                        {tasks
                                             .filter(t => t.id !== task.id && !task.dependencies.includes(t.id))
                                             .map(t => (
                                                 <option key={t.id} value={t.id}>{t.name}</option>
@@ -265,7 +304,7 @@ function TasksView() {
                                 <button 
                                     onClick={() => handleAddDependency(task.id)} 
                                     className="add-button"
-                                    disabled={allTasks.filter(t => t.id !== task.id && !task.dependencies.includes(t.id)).length === 0}
+                                    disabled={tasks.filter(t => t.id !== task.id && !task.dependencies.includes(t.id)).length === 0}
                                 >
                                     <FaPlus /> Add Dependency
                                 </button>

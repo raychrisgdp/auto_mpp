@@ -55,12 +55,12 @@ The backend API will be available at `http://localhost:5000`.
 
 2. Install the required packages:
    ```
-   npm install
+   npm install --legacy-peer-deps
    ```
 
 3. Start the development server:
    ```
-   npm start
+   NODE_OPTIONS=--openssl-legacy-provider npm start
    ```
 
 The frontend application will be available at `http://localhost:3000`.
