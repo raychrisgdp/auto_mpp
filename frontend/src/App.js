@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { NavLink, Route, BrowserRouter as Router, Switch } from 'react-router-dom';
 import './App.css';
 import PersonnelView from './components/PersonnelView';
+import RolesView from './components/RolesView';
 import TasksView from './components/TasksView';
 import TimelineView from './components/TimelineView';
 
@@ -26,6 +27,9 @@ function App() {
         <nav>
           <ul>
             <li>
+              <NavLink to="/roles" activeClassName="active-link">Roles</NavLink>
+            </li>
+            <li>
               <NavLink to="/personnel" activeClassName="active-link">Personnel</NavLink>
             </li>
             <li>
@@ -38,6 +42,9 @@ function App() {
         </nav>
 
         <Switch>
+          <Route path="/roles">
+            <RolesView />
+          </Route>
           <Route path="/personnel">
             <PersonnelView />
           </Route>

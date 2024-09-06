@@ -1,0 +1,155 @@
+.roles-view {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.role-form {
+    display: flex;
+    margin-bottom: 20px;
+}
+
+.role-input {
+    flex: 1;
+    padding: 5px;
+    margin-right: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.role-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.role-item {
+    background-color: #f8f8f8;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.role-details {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-grow: 1;
+    text-align: center;
+}
+
+.role-name {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.role-description {
+    font-size: 1em;
+}
+
+.button-group {
+    position: relative;
+}
+
+.options-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 5px 10px;
+}
+
+.options-dropdown {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 5px;
+    z-index: 1;
+    min-width: 120px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.options-dropdown button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 5px 10px;
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+.options-dropdown button:hover {
+    background-color: #f0f0f0;
+}
+
+.delete-button {
+    color: red;
+}
+
+.add-button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.add-button:hover {
+    background-color: #45a049;
+}
+
+.error-message {
+    color: red;
+    margin-top: 10px;
+}
+
+.role-name-edit, .role-description-edit {
+    font-size: 1em; /* Match the font size to the view mode */
+    border: 1px solid #ddd;
+    background-color: white;
+    text-align: center;
+    width: 100%;
+    padding: 5px;
+    margin-bottom: 5px;
+    border-radius: 4px;
+}
+
+.role-name-edit:focus, .role-description-edit:focus {
+    outline: none;
+    border-color: #4CAF50;
+}
+
+.role-select-container {
+    position: relative;
+    display: inline-block;
+    margin-left: 10px;
+}
+
+.role-select-description {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    font-size: 12px;
+    color: #666;
+    white-space: nowrap;
+}
+
+.role-select {
+    padding-right: 20px;
+}
+
+.edit-label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    display: block; /* Ensures the label is on a new line */
+}

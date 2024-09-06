@@ -1,9 +1,17 @@
 from app import db
 
 
+class Role(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), unique=True, nullable=False)
+    description = db.Column(db.String(100))
+
+
 class Personnel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
+    role_id = db.Column(db.Integer, db.ForeignKey("role.id"))
+    role = db.relationship("Role", backref=db.backref("personnel", lazy=True))
 
 
 class Task(db.Model):

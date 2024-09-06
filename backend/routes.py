@@ -2,7 +2,7 @@ from collections import defaultdict
 
 from app import app, db
 from flask import jsonify, request
-from models import Assignment, Personnel, Task
+from models import Assignment, Personnel, Role, Task
 
 
 def topological_sort(tasks):
@@ -125,13 +125,32 @@ def generate_timeline(tasks):
 def handle_personnel():
     if request.method == "POST":
         data = request.json
-        new_personnel = Personnel(name=data["name"])
+        new_personnel = Personnel(name=data["name"], role_id=data.get("role_id"))
         db.session.add(new_personnel)
         db.session.commit()
-        return jsonify({"id": new_personnel.id, "name": new_personnel.name}), 201
+        return (
+            jsonify(
+                {
+                    "id": new_personnel.id,
+                    "name": new_personnel.name,
+                    "role_id": new_personnel.role_id,
+                }
+            ),
+            201,
+        )
     else:
         personnel = Personnel.query.all()
-        return jsonify([{"id": p.id, "name": p.name} for p in personnel])
+        return jsonify(
+            [
+                {
+                    "id": p.id,
+                    "name": p.name,
+                    "role_id": p.role_id,
+                    "role_name": p.role.name if p.role else None,
+                }
+                for p in personnel
+            ]
+        )
 
 
 @app.route("/personnel/<int:id>", methods=["PUT", "DELETE"])
@@ -140,8 +159,11 @@ def handle_single_personnel(id):
     if request.method == "PUT":
         data = request.json
         personnel.name = data["name"]
+        personnel.role_id = data.get("role_id", personnel.role_id)
         db.session.commit()
-        return jsonify({"id": personnel.id, "name": personnel.name})
+        return jsonify(
+            {"id": personnel.id, "name": personnel.name, "role_id": personnel.role_id}
+        )
     elif request.method == "DELETE":
         db.session.delete(personnel)
         db.session.commit()
@@ -320,3 +342,50 @@ def delete_assignment(task_id, assignment_id):
     db.session.delete(assignment)
     db.session.commit()
     return "", 204
+
+
+@app.route("/roles", methods=["GET", "POST"])
+def handle_roles():
+    if request.method == "POST":
+        data = request.json
+        if len(data["name"]) > 50 or len(data.get("description", "")) > 100:
+            return jsonify({"error": "Name or description too long"}), 400
+        new_role = Role(name=data["name"], description=data.get("description", ""))
+        db.session.add(new_role)
+        db.session.commit()
+        return (
+            jsonify(
+                {
+                    "id": new_role.id,
+                    "name": new_role.name,
+                    "description": new_role.description,
+                }
+            ),
+            201,
+        )
+    else:
+        roles = Role.query.order_by(Role.name).all()
+        return jsonify(
+            [{"id": r.id, "name": r.name, "description": r.description} for r in roles]
+        )
+
+
+@app.route("/roles/<int:id>", methods=["PUT", "DELETE"])
+def handle_single_role(id):
+    role = Role.query.get_or_404(id)
+    if request.method == "PUT":
+        data = request.json
+        if len(data["name"]) > 50 or len(data.get("description", "")) > 100:
+            return jsonify({"error": "Name or description too long"}), 400
+        role.name = data["name"]
+        role.description = data.get("description", role.description)
+        db.session.commit()
+        return jsonify(
+            {"id": role.id, "name": role.name, "description": role.description}
+        )
+    elif request.method == "DELETE":
+        if Personnel.query.filter_by(role_id=role.id).first():
+            return jsonify({"error": "Cannot delete role with assigned personnel"}), 400
+        db.session.delete(role)
+        db.session.commit()
+        return "", 204

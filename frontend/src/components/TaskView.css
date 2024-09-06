@@ -37,18 +37,18 @@
 }
 
 .add-button {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-bottom: 10px;
-    align-self: flex-start;
+    background-color: #4CAF50; /* Green background */
+    color: white; /* White text */
+    border: none; /* No border */
+    padding: 10px 15px; /* Increased padding */
+    border-radius: 4px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor */
+    font-size: 16px; /* Larger font size */
+    transition: background-color 0.3s ease; /* Smooth transition */
 }
 
 .add-button:hover {
-    background-color: #45a049;
+    background-color: #45a049; /* Darker green on hover */
 }
 
 .task-section {

@@ -10,11 +10,12 @@ function TasksView() {
     const [error, setError] = useState('');
     const [personnel, setPersonnel] = useState([]);
     const [editingTaskId, setEditingTaskId] = useState(null);
+    const [allTasks, setAllTasks] = useState([]);
     const [addingDependencyForTask, setAddingDependencyForTask] = useState(null);
     const [addingAssignmentForTask, setAddingAssignmentForTask] = useState(null);
     const [selectedPersonnel, setSelectedPersonnel] = useState('');
     const [newAssignmentHours, setNewAssignmentHours] = useState('');
-    const editableRef = useRef(null);
+    const editableRef = useRef(null); // Create a ref for the editable span
 
     useEffect(() => {
         fetchTasks();
@@ -25,6 +26,7 @@ function TasksView() {
         try {
             const response = await axios.get(`${API_BASE_URL}/tasks`);
             setTasks(response.data);
+            setAllTasks(response.data);
         } catch (err) {
             setError('Failed to fetch tasks');
         }
@@ -49,7 +51,7 @@ function TasksView() {
     };
 
     const handleEditTask = (taskId) => {
-        setEditingTaskId(taskId);
+        setEditingTaskId(taskId); // Set the task ID for editing
     };
 
     const handleUpdateTask = async (taskId, newName) => {
@@ -132,9 +134,9 @@ function TasksView() {
         try {
             await axios.put(`${API_BASE_URL}/tasks/${taskId}/assignments/${assignmentId}`, {
                 hours: hours,
-                personnel_id: personnelId
+                personnel_id: personnelId // Include personnel_id in the request
             });
-            fetchTasks();
+            fetchTasks(); // Fetch updated tasks from the server
         } catch (err) {
             setError('Failed to update assignment');
         }
@@ -142,21 +144,21 @@ function TasksView() {
 
     const handleUpdateAssignment = async (taskId, assignment) => {
         await handleSubmitAssignmentEdit(taskId, assignment.id, assignment.hours, assignment.personnel_id);
-        assignment.isEditing = false;
-        setTasks([...tasks]);
+        assignment.isEditing = false; // Reset editing state
+        setTasks([...tasks]); // Refresh tasks to reflect changes
     };
 
     useEffect(() => {
         if (editingTaskId !== null && editableRef.current) {
-            editableRef.current.focus();
+            editableRef.current.focus(); // Focus the editable span when editing
             const range = document.createRange();
             const selection = window.getSelection();
             range.selectNodeContents(editableRef.current);
-            range.collapse(false);
+            range.collapse(false); // Collapse to the end of the content
             selection.removeAllRanges();
-            selection.addRange(range);
+            selection.addRange(range); // Set the selection to the end
         }
-    }, [editingTaskId]);
+    }, [editingTaskId]); // Run this effect when editingTaskId changes
 
     return (
         <div className="tasks-view">
@@ -168,17 +170,17 @@ function TasksView() {
                     <div className="task-header">
                         {editingTaskId === task.id ? (
                             <span
-                                ref={editableRef}
+                                ref={editableRef} // Attach the ref to the editable span
                                 contentEditable
                                 suppressContentEditableWarning
                                 onBlur={(e) => {
-                                    handleUpdateTask(task.id, e.target.innerText);
+                                    handleUpdateTask(task.id, e.target.innerText); // Update task on blur
                                 }}
                                 onKeyDown={(e) => {
                                     if (e.key === 'Enter') {
-                                        e.preventDefault();
-                                        handleUpdateTask(task.id, e.target.innerText);
-                                        setEditingTaskId(null);
+                                        e.preventDefault(); // Prevent new line
+                                        handleUpdateTask(task.id, e.target.innerText); // Update task on Enter
+                                        setEditingTaskId(null); // Exit editing mode
                                     }
                                 }}
                                 className="task-name editable"
@@ -212,13 +214,13 @@ function TasksView() {
                                             type="number" 
                                             value={assignment.hours} 
                                             onChange={(e) => {
-                                                assignment.hours = e.target.value;
-                                                setTasks([...tasks]);
+                                                assignment.hours = e.target.value; // Update hours in state
+                                                setTasks([...tasks]); // Refresh tasks to reflect changes
                                             }} 
                                         />
                                         <button onClick={() => handleUpdateAssignment(task.id, assignment, assignment.hours)}>Save</button>
                                         <button onClick={() => {
-                                            assignment.isEditing = false;
+                                            assignment.isEditing = false; // Cancel editing
                                             setTasks([...tasks]);
                                         }}>Cancel</button>
                                     </div>
@@ -276,7 +278,7 @@ function TasksView() {
                     <div className="dependencies">
                         <h4 style={{ textAlign: 'left' }}>Dependencies</h4>
                         {task.dependencies && task.dependencies.map(depId => {
-                            const depTask = tasks.find(t => t.id === depId);
+                            const depTask = allTasks.find(t => t.id === depId);
                             return (
                                 <div key={depId} className="dependency-item">
                                     <span>{depTask ? depTask.name : `Task ${depId}`}</span>
@@ -291,7 +293,7 @@ function TasksView() {
                                 <div className="add-dependency-form">
                                     <select onChange={(e) => handleSubmitDependency(task.id, parseInt(e.target.value))}>
                                         <option value="">Select Dependency</option>
-                                        {tasks
+                                        {allTasks
                                             .filter(t => t.id !== task.id && !task.dependencies.includes(t.id))
                                             .map(t => (
                                                 <option key={t.id} value={t.id}>{t.name}</option>
@@ -304,7 +306,7 @@ function TasksView() {
                                 <button 
                                     onClick={() => handleAddDependency(task.id)} 
                                     className="add-button"
-                                    disabled={tasks.filter(t => t.id !== task.id && !task.dependencies.includes(t.id)).length === 0}
+                                    disabled={allTasks.filter(t => t.id !== task.id && !task.dependencies.includes(t.id)).length === 0}
                                 >
                                     <FaPlus /> Add Dependency
                                 </button>
